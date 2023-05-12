@@ -1,14 +1,24 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	let msg = '';
+	async function fetchApi() {
+		return await (await fetch('/api/hello')).text();
+	}
 
-	onMount(async () => {
-		msg = await (await fetch('/api/hello')).text();
-		console.log(msg);
-	});
+	let msg: Promise<String>
+
+	function handleClick() {
+		msg = fetchApi()
+	}
 </script>
 
 <h1>Welcome to File Server</h1>
-<h2>
-	{msg}
-</h2>
+<button on:click={handleClick}>
+	{#await msg}
+		...waiting
+	{:then text}
+		{#if text}
+			{text}
+		{:else}
+			Click me!
+		{/if}
+	{/await}
+</button>
